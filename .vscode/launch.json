@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "cppdbg",
+      "request": "launch",
+      "args": [],
+      "stopAtEntry": false,
+      "externalConsole": true,
+      "cwd": "c:/Users/hclin/OneDrive/桌面/My Work/School work/Spring 2025/CS205 AI/Project 2/CS205_Project_2_Feature_Selection_with_Nearest_Neighbor",
+      "program": "c:/Users/hclin/OneDrive/桌面/My Work/School work/Spring 2025/CS205 AI/Project 2/CS205_Project_2_Feature_Selection_with_Nearest_Neighbor/build/Debug/outDebug",
+      "MIMode": "gdb",
+      "miDebuggerPath": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    }
+  ]
+}

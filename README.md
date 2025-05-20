@@ -1,1 +1,2 @@
-# CS205_Project_2_Feature_Selection_with_Nearest_Neighbor
+# CS205 Project 2
+# Feature Selection with Nearest Neighbor
