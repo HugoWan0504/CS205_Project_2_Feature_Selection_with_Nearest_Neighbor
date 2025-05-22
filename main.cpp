@@ -23,9 +23,7 @@ int main() {
     if (choice == 1) {
         forward_selection(features, labels, 1);
     } else if (choice == 2) {
-        cout << "Backward Elimination not yet implemented.\n";
-        // But it'd be something like this, too
-        // backward_elimination(features, labels, 1);
+        backward_elimination(features, labels, 1);
     } else {
         cout << "Invalid option.\n";
     }

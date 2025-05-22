@@ -38,7 +38,7 @@ double nearest_neighbor_classification(const vector<vector<double>> &features,
 
     for (int i = 0; i < total; ++i) {
         double nrDist = DBL_MAX;    // nearest distance
-        int nrIndex = -1;      // nearest index
+        int nrIndex = -1;           // nearest index
 
         for (int j = 0; j < total; ++j) {
             if (i == j) continue;
@@ -64,7 +64,7 @@ double nearest_neighbor_classification(const vector<vector<double>> &features,
     return static_cast<double>(correct) / total * 100.0;
 }
 
-
+// Part 1.1 Forward Selection Search
 void forward_selection(const vector<vector<double>> &features,
                        const vector<int> &labels,
                        int LMT = 1) {   // local minimum threshold
@@ -130,13 +130,73 @@ void forward_selection(const vector<vector<double>> &features,
 }
 
 
-/*
+// Part 1.2 Backward Elimination Search
 void backward_elimination(const vector<vector<double>> &features,
-                          const vector<int> &labels);
+                          const vector<int> &labels,
+                          int LMT = 1) {        // local minimum threshold
+    int numF = features[0].size();              // number of features
+    int numR = features.size();                 // number of records
+
+    vector<int> selectF(numF);                  // selected features (starting with all)
+    iota(selectF.begin(), selectF.end(), 0);    // fill with 0 to numF - 1
+
+    double bestAccuracy = nearest_neighbor_classification(features, labels, selectF); // accuracy with all features
+    vector<int> bestFSet = selectF;   // best feature set
+
+    // Short summary of the input dataset
+    cout << "This dataset has " << numR << " records and " << numF << " features." << endl;
+    cout << "Initial accuracy with all features: " << fixed << setprecision(2) << bestAccuracy << "%" << endl;
+    cout << "Beginning search." << endl;
+    int LM = LMT;  // set local minimum threshold
+
+    while (selectF.size() > 1) {
+        double currBestAccuracy = 0.0;    // track the current best accuracy
+        int removeF = -1;                 // track which feature to remove
+
+        for (int f : selectF) {
+            vector<int> trialF = selectF; // copy current feature set
+            // remove feature f from the trial set
+            trialF.erase(remove(trialF.begin(), trialF.end(), f), trialF.end());
+
+            double accuracy = nearest_neighbor_classification(features, labels, trialF);
+            cout << "     Current feature(s) { ";
+            for (int i : trialF) cout << i + 1 << " ";
+            cout << "} with accuracy " << fixed << setprecision(2) << accuracy << "%" << endl;
+
+            if (accuracy > currBestAccuracy) {
+                currBestAccuracy = accuracy;
+                removeF = f;
+            }
+        }
+
+        // Actually remove the feature that gives the best accuracy improvement
+        selectF.erase(remove(selectF.begin(), selectF.end(), removeF), selectF.end());
+
+        if (currBestAccuracy > bestAccuracy) {
+            bestAccuracy = currBestAccuracy;
+            bestFSet = selectF;
+            LM = LMT; // reset local minimum threshold
+            cout << "Current best overall is { ";
+            for (int i : bestFSet) cout << i + 1 << " ";
+            cout << "} with accuracy " << fixed << setprecision(2) << bestAccuracy << "%" << endl;
+        } else {
+            LM--;
+            cout << "The accuracy is decreasing!" << endl;
+            cout << "Current round feature(s): { ";
+            for (int i : selectF) cout << i + 1 << " ";
+            cout << "} with accuracy " << currBestAccuracy << "%, lower than best "
+                 << bestAccuracy << "%" << endl;
+
+            if (LM == 0) break;
+        }
+    }
+
+    cout << "Best feature subset is { ";
+    for (int i : bestFSet) cout << i + 1 << " ";
+    cout << "} with accuracy " << fixed << setprecision(2) << bestAccuracy << "%" << endl;
+}
 
 
-void normalize(vector<vector<double>> &features);
-*/
 
 
 #endif /* header_functions */
