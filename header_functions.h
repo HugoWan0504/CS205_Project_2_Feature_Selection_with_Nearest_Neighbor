@@ -29,53 +29,106 @@ void load_data(const string &filename, vector<vector<double>> &features, vector<
     infile.close();
 }
 
+// Replace stub with a real NNC
+double nearest_neighbor_classification(const vector<vector<double>> &features,
+                                       const vector<int> &labels,
+                                       const vector<int> &selectF) { // selected features
+    int total = features.size();
+    int correct = 0;
 
-double leave_one_out_cross_validation_stub(const vector<vector<double>> &, const vector<int> &, const vector<int> &) {                                    
-    return rand() % 100 + 1;  // Accuracy between 1 and 100 %
-}
+    for (int i = 0; i < total; ++i) {
+        double nrDist = DBL_MAX;    // nearest distance
+        int nrIndex = -1;      // nearest index
 
+        for (int j = 0; j < total; ++j) {
+            if (i == j) continue;
 
-void forward_selection(const vector<vector<double>> &features, const vector<int> &labels) {
-    int numF = features[0].size();  // Feature numbers
-    vector<int> currF;              // Current set of the features
-
-    cout << "Beginning search." << endl;
-
-    for (int i = 0; i < numF; ++i) {
-        int addF = -1; // Feature to add at this level
-        double bestAccuracy = 0; // Best accuracy so far
-
-        for (int k = 0; k < numF; ++k) {
-            if (find(currF.begin(), currF.end(), k) != currF.end()) {
-                continue; // Skip if already added
+            double dist = 0.0;
+            for (int f : selectF) {
+                double diff = features[i][f] - features[j][f];
+                dist += diff * diff;
             }
+            dist = sqrt(dist);
 
-            vector<int> tempSet = currF;
-            tempSet.push_back(k);
-
-            // Use stub accuracy for now
-            double accuracy = leave_one_out_cross_validation_stub(features, labels, tempSet);
-
-            cout << "--Considering adding feature " << k + 1 << " (accuracy: " << accuracy << "%)\n";
-
-            if (accuracy > bestAccuracy) {
-                bestAccuracy = accuracy;
-                addF = k;
+            if (dist < nrDist) {
+                nrDist = dist;
+                nrIndex = j;
             }
         }
 
-        if (addF != -1) {
-            currF.push_back(addF);
-            cout << "On level " << i + 1 << ", added feature " << addF + 1
-                 << " to current set (accuracy: " << bestAccuracy << "%)\n";
+        if (labels[i] == labels[nrIndex]) {
+            ++correct;
         }
     }
 
-    cout << "Finished search! The best feature subset is { ";
-    for (int f : currF)
-        cout << f + 1 << " ";
-    cout << "}\n";
+    return static_cast<double>(correct) / total * 100.0;
 }
+
+
+void forward_selection(const vector<vector<double>> &features,
+                       const vector<int> &labels,
+                       int LMT = 1) {   // local minimum threshold
+    int numF = features[0].size();      // number of features
+    int numR = features.size();         // number of records
+
+    vector<int> selectF;        // selected features
+    vector<int> bestFSet;       // best feature set
+    double bestAccuracy = 0.0;  // best accuracy
+
+    // Short summary of the input dataset
+    cout << "This dataset has " << numR << " records and " << numF << " features." << endl;
+    cout << "Beginning search." << endl;
+
+    int LM = LMT; // set local minimum threshold to the local minimum
+
+    for (int level = 0; level < numF; ++level) {
+        double currBestAccuracy = 0.0;      // track the current best accuracy
+        vector<int> currBestSet;            // track the current best set
+
+        for (int f = 0; f < numF; ++f) {
+            if (find(selectF.begin(), selectF.end(), f) != selectF.end()) continue;
+
+            vector<int> trialF = selectF;   // features' trials
+            trialF.push_back(f);
+
+            double accuracy = nearest_neighbor_classification(features, labels, trialF);
+            cout << "     Current feature(s) { ";
+            for (int i : trialF) cout << i + 1 << " ";
+            cout << "} with accuracy " << fixed << setprecision(2) << accuracy << "%" << endl;
+
+            if (accuracy > currBestAccuracy) {
+                currBestAccuracy = accuracy;
+                currBestSet = trialF;
+            }
+        }
+
+        if (currBestSet != selectF) {
+            selectF = currBestSet;
+            if (currBestAccuracy > bestAccuracy) {
+                bestAccuracy = currBestAccuracy;
+                bestFSet = selectF;
+                LM = LMT;
+                cout << "Current best overall is { ";
+                for (int i : bestFSet) cout << i + 1 << " ";
+                cout << "} with accuracy " << fixed << setprecision(2) << bestAccuracy << "%" << endl;
+            } else {
+                LM--;
+                cout << "The accuracy is decreasing!" << endl;
+                cout << "Current round feature(s): { ";
+                for (int i : selectF) cout << i + 1 << " ";
+                cout << "} with accuracy " << currBestAccuracy << "%, lower than best "
+                     << bestAccuracy << "%" << endl;
+
+                if (LM == 0) break;
+            }
+        }
+    }
+
+    cout << "Best feature subset is { ";
+    for (int i : bestFSet) cout << i + 1 << " ";
+    cout << "} with accuracy " << fixed << setprecision(2) << bestAccuracy << "%" << endl;
+}
+
 
 /*
 void backward_elimination(const vector<vector<double>> &features,

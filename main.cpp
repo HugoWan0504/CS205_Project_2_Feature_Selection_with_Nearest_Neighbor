@@ -3,7 +3,7 @@
 using namespace std;
 
 int main() {
-    cout << "Welcome to Hugo Wan's Feature Selection Algorithm.\n";
+    cout << "Welcome to Hugo Wan's Feature Selection Algorithm!\n";
     cout << "Type in the name of the file to test: ";
     
     string filename;
@@ -17,13 +17,19 @@ int main() {
     cout << "Type the number of the algorithm you want to run.\n";
     cout << "1) Forward Selection\n";
     cout << "2) Backward Elimination\n";
+    cout << "Your choice: ";
     cin >> choice;
 
     if (choice == 1) {
-        forward_selection(features, labels);
-    } else {
+        forward_selection(features, labels, 1);
+    } else if (choice == 2) {
         cout << "Backward Elimination not yet implemented.\n";
+        // But it'd be something like this, too
+        // backward_elimination(features, labels, 1);
+    } else {
+        cout << "Invalid option.\n";
     }
+
 
     return 0;
 }
