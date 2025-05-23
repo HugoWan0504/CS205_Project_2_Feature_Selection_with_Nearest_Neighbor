@@ -12,6 +12,10 @@ g++ -std=c++17 -o main main.cpp
 ```bash
 ./main
 ```
+* Run command to open the CSV graph of the results after running the search: 
+```bash
+python3 result_graph.py
+```
 
 ## Input Summary
 * Enter test filename to input a dataset
@@ -20,3 +24,4 @@ g++ -std=c++17 -o main main.cpp
 
 ## Result Summary
 * Output the best feature subset with the best accuracy when the accuracy is starting to decrease
+* A bar plot of the best accuracy of each iteration is shown. Only plot it up to the first decreasing accuarcy.

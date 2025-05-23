@@ -97,11 +97,6 @@ void forward_selection(const vector<vector<double>> &features,
             for (int i : trialF) cout << i + 1 << " ";
             cout << "} with accuracy " << fixed << setprecision(2) << accuracy << "%" << endl;
 
-            // Write to CSV after evaluating each trial
-            outfile << level + 1 << ",";
-            for (int i : trialF) outfile << (i + 1) << " ";
-            outfile << "," << fixed << setprecision(2) << accuracy << endl;
-
             if (accuracy > currBestAccuracy) {
                 currBestAccuracy = accuracy;
                 currBestSet = trialF;
@@ -113,7 +108,13 @@ void forward_selection(const vector<vector<double>> &features,
             if (currBestAccuracy > bestAccuracy) {
                 bestAccuracy = currBestAccuracy;
                 bestFSet = selectF;
-                LM = LMT;
+                LM = LMT; // reset local minimum threshold
+
+                // Log only improving results
+                outfile << level + 1 << ",";
+                for (int i : bestFSet) outfile << (i + 1) << " ";
+                outfile << "," << fixed << setprecision(2) << bestAccuracy << endl;
+
                 cout << "Current best overall is { ";
                 for (int i : bestFSet) cout << i + 1 << " ";
                 cout << "} with accuracy " << fixed << setprecision(2) << bestAccuracy << "%" << endl;
@@ -125,7 +126,13 @@ void forward_selection(const vector<vector<double>> &features,
                 cout << "} with accuracy " << currBestAccuracy << "%, lower than best "
                      << bestAccuracy << "%" << endl;
 
-                if (LM == 0) break;
+                if (LM == 0) {
+                    // log final unsuccessful trial
+                    outfile << "FINAL_ATTEMPT" << ",";
+                    for (int i : selectF) outfile << (i + 1) << " ";
+                    outfile << "," << fixed << setprecision(2) << currBestAccuracy << "\n";
+                    break;
+                }
             }
         }
     }
@@ -178,12 +185,6 @@ void backward_elimination(const vector<vector<double>> &features,
             for (int i : trialF) cout << i + 1 << " ";
             cout << "} with accuracy " << fixed << setprecision(2) << accuracy << "%" << endl;
 
-            // Write to CSV after evaluating each trial
-            outfile << numF - selectF.size() << ",";  // level = number of removals so far
-            for (int i : selectF) outfile << (i + 1) << " ";
-            outfile << "," << fixed << setprecision(2) << currBestAccuracy << "\n";
-
-
             if (accuracy > currBestAccuracy) {
                 currBestAccuracy = accuracy;
                 removeF = f;
@@ -197,6 +198,12 @@ void backward_elimination(const vector<vector<double>> &features,
             bestAccuracy = currBestAccuracy;
             bestFSet = selectF;
             LM = LMT; // reset local minimum threshold
+
+            // Log only improving results
+            outfile << numF - selectF.size() << ",";
+            for (int i : bestFSet) outfile << (i + 1) << " ";
+            outfile << "," << fixed << setprecision(2) << bestAccuracy << endl;
+
             cout << "Current best overall is { ";
             for (int i : bestFSet) cout << i + 1 << " ";
             cout << "} with accuracy " << fixed << setprecision(2) << bestAccuracy << "%" << endl;
@@ -208,7 +215,13 @@ void backward_elimination(const vector<vector<double>> &features,
             cout << "} with accuracy " << currBestAccuracy << "%, lower than best "
                  << bestAccuracy << "%" << endl;
 
-            if (LM == 0) break;
+            if (LM == 0) {
+                // log final unsuccessful trial
+                outfile << "FINAL_ATTEMPT" << ",";
+                for (int i : selectF) outfile << (i + 1) << " ";
+                outfile << "," << fixed << setprecision(2) << currBestAccuracy << "\n";
+                break;
+            }
         }
     }
 
