@@ -70,6 +70,7 @@ void forward_selection(const vector<vector<double>> &features,
                        int LMT = 1) {   // local minimum threshold
     int numF = features[0].size();      // number of features
     int numR = features.size();         // number of records
+    ofstream outfile("results.csv");    // output results to CSV
 
     vector<int> selectF;        // selected features
     vector<int> bestFSet;       // best feature set
@@ -95,6 +96,11 @@ void forward_selection(const vector<vector<double>> &features,
             cout << "     Current feature(s) { ";
             for (int i : trialF) cout << i + 1 << " ";
             cout << "} with accuracy " << fixed << setprecision(2) << accuracy << "%" << endl;
+
+            // Write to CSV after evaluating each trial
+            outfile << level + 1 << ",";
+            for (int i : trialF) outfile << (i + 1) << " ";
+            outfile << "," << fixed << setprecision(2) << accuracy << endl;
 
             if (accuracy > currBestAccuracy) {
                 currBestAccuracy = accuracy;
@@ -127,6 +133,14 @@ void forward_selection(const vector<vector<double>> &features,
     cout << "Best feature subset is { ";
     for (int i : bestFSet) cout << i + 1 << " ";
     cout << "} with accuracy " << fixed << setprecision(2) << bestAccuracy << "%" << endl;
+
+    // Add the FINAL row properly in results.csv
+    outfile << "FINAL" << ",";
+    for (int i : bestFSet) outfile << (i + 1) << " ";
+    outfile << "," << fixed << setprecision(2) << bestAccuracy << endl;
+
+    // Close CSV file
+    outfile.close();
 }
 
 
@@ -136,6 +150,7 @@ void backward_elimination(const vector<vector<double>> &features,
                           int LMT = 1) {        // local minimum threshold
     int numF = features[0].size();              // number of features
     int numR = features.size();                 // number of records
+    ofstream outfile("results.csv");            // output results to CSV
 
     vector<int> selectF(numF);                  // selected features (starting with all)
     iota(selectF.begin(), selectF.end(), 0);    // fill with 0 to numF - 1
@@ -162,6 +177,12 @@ void backward_elimination(const vector<vector<double>> &features,
             cout << "     Current feature(s) { ";
             for (int i : trialF) cout << i + 1 << " ";
             cout << "} with accuracy " << fixed << setprecision(2) << accuracy << "%" << endl;
+
+            // Write to CSV after evaluating each trial
+            outfile << numF - selectF.size() << ",";  // level = number of removals so far
+            for (int i : selectF) outfile << (i + 1) << " ";
+            outfile << "," << fixed << setprecision(2) << currBestAccuracy << "\n";
+
 
             if (accuracy > currBestAccuracy) {
                 currBestAccuracy = accuracy;
@@ -194,6 +215,14 @@ void backward_elimination(const vector<vector<double>> &features,
     cout << "Best feature subset is { ";
     for (int i : bestFSet) cout << i + 1 << " ";
     cout << "} with accuracy " << fixed << setprecision(2) << bestAccuracy << "%" << endl;
+
+    // Add the FINAL row properly in results.csv
+    outfile << "FINAL" << ",";
+    for (int i : bestFSet) outfile << (i + 1) << " ";
+    outfile << "," << fixed << setprecision(2) << bestAccuracy << endl;
+
+    // Close CSV file
+    outfile.close();
 }
 
 
