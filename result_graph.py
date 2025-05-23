@@ -1,55 +1,75 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import os
+from matplotlib.patches import Patch
 
-# Load CSV
+# Load and re-save clean CSV (optional)
 df = pd.read_csv('results.csv', header=None, names=['Level', 'Features', 'Accuracy'])
+df.to_csv("results.csv", index=False)
 
-# Save a copy for reuse or submission
-df.to_csv("results.csv", index=False) 
+# Filter for improving bests + final subset trial
+plot_df = df[df['Level'] != 'FINAL'].copy().reset_index(drop=True)
 
-# Filter out all entries except improving + final attempt
-plot_df = df[df['Level'] != 'FINAL'].copy()
-plot_df.reset_index(drop=True, inplace=True)
+# Create plot
+fig, ax = plt.subplots(figsize=(max(10, len(plot_df) * 1.2), 6))
 
-plt.figure(figsize=(12, 6))
-
-# Setup bar colors: all blue by default
+# Set up colors
 colors = ['skyblue'] * len(plot_df)
-
-# Highlight second-to-last as final best (yellow)
 if len(plot_df) >= 2:
-    colors[-2] = 'orange'  # second-last bar = best
-    # last bar (final attempt) remains skyblue
+    colors[-2] = 'orange'  # Highlight final best subset
 
-# Plot bars
-plt.bar(range(len(plot_df)), plot_df['Accuracy'],
-        tick_label=plot_df['Features'], color=colors)
+# Draw bars
+bars = ax.bar(range(len(plot_df)), plot_df['Accuracy'], color=colors)
 
-# Set axis and title
-plt.xlabel("Feature Subsets")
-plt.ylabel("Accuracy (%)")
-plt.title("Only Best Subsets Through Search")
-plt.xticks(rotation=45)
+# Add accuracy % inside the bars
+for i, (bar, acc) in enumerate(zip(bars, plot_df['Accuracy'])):
+    height = bar.get_height()
+    try:
+        acc_float = float(acc)
+        ax.text(bar.get_x() + bar.get_width() / 2,
+                height - 3,
+                f'{acc_float:.1f}%',
+                ha='center', va='top',
+                fontsize=9,
+                weight='bold' if i == len(plot_df) - 2 else 'normal',
+                color='black')
+    except ValueError:
+        continue
+
+# Add features below each bar
+for i, (bar, feature_str) in enumerate(zip(bars, plot_df['Features'])):
+    features = feature_str.strip().split()
+    for j, feature in enumerate(reversed(features)):
+        ax.text(bar.get_x() + bar.get_width() / 2,
+                -5 - j * 4,  # below x-axis
+                feature,
+                ha='center', va='top',
+                fontsize=8)
+
+def format_features(features, row_len=5):
+    # Break into lines of 'row_len' features per row
+    return "\n".join(" ".join(str(f) for f in features[i:i+row_len]) 
+                     for i in range(0, len(features), row_len))
+
+# Generate x-axis labels
+labels = [format_features(fs) for fs in df['Features']]
+
+# Hide x-axis ticks and labels
+ax.set_xticks([])
+
+ax.set_xlabel("Feature Subsets (shown below each bar)")
+ax.set_ylabel("Accuracy (%)")
+ax.set_title("Only Best Subsets Through Search")
 
 # Legend
-from matplotlib.patches import Patch
 plt.legend(handles=[
     Patch(color='skyblue', label='Trial Subsets'),
     Patch(color='orange', label='Final Best Subset')
-], loc='lower left', bbox_to_anchor=(-0.05, -0.2))  # ← here
+], loc='upper left', bbox_to_anchor=(0.01, 1.2))
 
 
-bars = plt.bar(range(len(plot_df)), plot_df['Accuracy'],
-               tick_label=plot_df['Features'], color=colors)
+# Adjust layout for spacing
+plt.subplots_adjust(bottom=0.20)
+plt.tight_layout(pad=4.0)
 
-# Annotate each bar with accuracy
-for bar, acc in zip(bars, plot_df['Accuracy']):
-    height = bar.get_height()
-    plt.text(bar.get_x() + bar.get_width() / 2,
-         height - 3,  # shift down slightly inside bar
-         f'{acc:.1f}%',
-         ha='center', va='top', color='black', fontsize=9, weight='bold')
-
-plt.tight_layout()
+# Show plot
 plt.show()
