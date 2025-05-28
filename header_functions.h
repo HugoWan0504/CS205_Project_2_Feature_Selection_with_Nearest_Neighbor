@@ -95,7 +95,7 @@ void forward_selection(const vector<vector<double>> &features,
             double accuracy = nearest_neighbor_classification(features, labels, trialF);
             cout << "     Current feature(s) { ";
             for (int i : trialF) cout << i + 1 << " ";
-            cout << "} with accuracy " << fixed << setprecision(2) << accuracy << "%" << endl;
+            cout << "} with accuracy " << fixed << setprecision(1) << accuracy << "%" << endl;
 
             if (accuracy > currBestAccuracy) {
                 currBestAccuracy = accuracy;
@@ -113,11 +113,11 @@ void forward_selection(const vector<vector<double>> &features,
                 // Log only improving results
                 outfile << level + 1 << ",";
                 for (int i : bestFSet) outfile << (i + 1) << " ";
-                outfile << "," << fixed << setprecision(2) << bestAccuracy << endl;
+                outfile << "," << fixed << setprecision(1) << bestAccuracy << endl;
 
                 cout << "Current best overall is { ";
                 for (int i : bestFSet) cout << i + 1 << " ";
-                cout << "} with accuracy " << fixed << setprecision(2) << bestAccuracy << "%" << endl;
+                cout << "} with accuracy " << fixed << setprecision(1) << bestAccuracy << "%" << endl;
             } else {
                 LM--;
                 cout << "The accuracy is decreasing!" << endl;
@@ -130,7 +130,7 @@ void forward_selection(const vector<vector<double>> &features,
                     // log final unsuccessful trial
                     outfile << "FINAL_ATTEMPT" << ",";
                     for (int i : selectF) outfile << (i + 1) << " ";
-                    outfile << "," << fixed << setprecision(2) << currBestAccuracy << "\n";
+                    outfile << "," << fixed << setprecision(1) << currBestAccuracy << "\n";
                     break;
                 }
             }
@@ -139,12 +139,12 @@ void forward_selection(const vector<vector<double>> &features,
 
     cout << "Best feature subset is { ";
     for (int i : bestFSet) cout << i + 1 << " ";
-    cout << "} with accuracy " << fixed << setprecision(2) << bestAccuracy << "%" << endl;
+    cout << "} with accuracy " << fixed << setprecision(1) << bestAccuracy << "%" << endl;
 
     // Add the FINAL row properly in results.csv
     outfile << "FINAL" << ",";
     for (int i : bestFSet) outfile << (i + 1) << " ";
-    outfile << "," << fixed << setprecision(2) << bestAccuracy << endl;
+    outfile << "," << fixed << setprecision(1) << bestAccuracy << endl;
 
     // Close CSV file
     outfile.close();
@@ -167,7 +167,7 @@ void backward_elimination(const vector<vector<double>> &features,
 
     // Short summary of the input dataset
     cout << "This dataset has " << numR << " records and " << numF << " features." << endl;
-    cout << "Initial accuracy with all features: " << fixed << setprecision(2) << bestAccuracy << "%" << endl;
+    cout << "Initial accuracy with all features: " << fixed << setprecision(1) << bestAccuracy << "%" << endl;
     cout << "Beginning search." << endl;
     int LM = LMT;  // set local minimum threshold
 
@@ -183,7 +183,7 @@ void backward_elimination(const vector<vector<double>> &features,
             double accuracy = nearest_neighbor_classification(features, labels, trialF);
             cout << "     Current feature(s) { ";
             for (int i : trialF) cout << i + 1 << " ";
-            cout << "} with accuracy " << fixed << setprecision(2) << accuracy << "%" << endl;
+            cout << "} with accuracy " << fixed << setprecision(1) << accuracy << "%" << endl;
 
             if (accuracy > currBestAccuracy) {
                 currBestAccuracy = accuracy;
@@ -202,11 +202,11 @@ void backward_elimination(const vector<vector<double>> &features,
             // Log only improving results
             outfile << numF - selectF.size() << ",";
             for (int i : bestFSet) outfile << (i + 1) << " ";
-            outfile << "," << fixed << setprecision(2) << bestAccuracy << endl;
+            outfile << "," << fixed << setprecision(1) << bestAccuracy << endl;
 
             cout << "Current best overall is { ";
             for (int i : bestFSet) cout << i + 1 << " ";
-            cout << "} with accuracy " << fixed << setprecision(2) << bestAccuracy << "%" << endl;
+            cout << "} with accuracy " << fixed << setprecision(1) << bestAccuracy << "%" << endl;
         } else {
             LM--;
             cout << "The accuracy is decreasing!" << endl;
@@ -219,7 +219,7 @@ void backward_elimination(const vector<vector<double>> &features,
                 // log final unsuccessful trial
                 outfile << "FINAL_ATTEMPT" << ",";
                 for (int i : selectF) outfile << (i + 1) << " ";
-                outfile << "," << fixed << setprecision(2) << currBestAccuracy << "\n";
+                outfile << "," << fixed << setprecision(1) << currBestAccuracy << "\n";
                 break;
             }
         }
@@ -227,12 +227,12 @@ void backward_elimination(const vector<vector<double>> &features,
 
     cout << "Best feature subset is { ";
     for (int i : bestFSet) cout << i + 1 << " ";
-    cout << "} with accuracy " << fixed << setprecision(2) << bestAccuracy << "%" << endl;
+    cout << "} with accuracy " << fixed << setprecision(1) << bestAccuracy << "%" << endl;
 
     // Add the FINAL row properly in results.csv
     outfile << "FINAL" << ",";
     for (int i : bestFSet) outfile << (i + 1) << " ";
-    outfile << "," << fixed << setprecision(2) << bestAccuracy << endl;
+    outfile << "," << fixed << setprecision(1) << bestAccuracy << endl;
 
     // Close CSV file
     outfile.close();

@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 
 # Load and re-save clean CSV (optional)
-df = pd.read_csv('results.csv', header=None, names=['Level', 'Features', 'Accuracy'])
+csv_path = "results.csv"  # You can change this if needed
+df = pd.read_csv(csv_path, header=None, names=['Level', 'Features', 'Accuracy'])
 df.to_csv("results.csv", index=False)
 
 # Filter for improving bests + final subset trial
@@ -35,15 +36,33 @@ for i, (bar, acc) in enumerate(zip(bars, plot_df['Accuracy'])):
     except ValueError:
         continue
 
-# Add features below each bar
+# Determine the method used from the filename
+method_type = "backward" if "backward" in csv_path.lower() else "forward"
+
+# Determine total features (used only for backward)
+if method_type == "backward":
+    total_features = set(map(str, range(1, max(map(int, " ".join(df['Features']).split())) + 1)))
+
+# Add feature labels under each bar
 for i, (bar, feature_str) in enumerate(zip(bars, plot_df['Features'])):
-    features = feature_str.strip().split()
-    for j, feature in enumerate(reversed(features)):
-        ax.text(bar.get_x() + bar.get_width() / 2,
-                -5 - j * 4,  # below x-axis
-                feature,
-                ha='center', va='top',
-                fontsize=8)
+    features = set(feature_str.strip().split())
+
+    if method_type == "backward":
+        removed = sorted(total_features - features, key=lambda x: int(x))
+        if len(removed) <= 8:
+            label = f"All but {' '.join(removed)}"
+        else:
+            label = f"{len(removed)} removed"
+    else:
+        # forward selection: show selected features directly
+        label = " ".join(sorted(features, key=lambda x: int(x)))
+
+    ax.text(bar.get_x() + bar.get_width() / 2,
+            -5,
+            label,
+            ha='center', va='top',
+            fontsize=8, rotation=15)
+
 
 def format_features(features, row_len=5):
     # Break into lines of 'row_len' features per row
