@@ -39,29 +39,28 @@ for i, (bar, acc) in enumerate(zip(bars, plot_df['Accuracy'])):
 # Determine the method used from the filename
 method_type = "backward" if "backward" in csv_path.lower() else "forward"
 
-# Determine total features (used only for backward)
-if method_type == "backward":
-    total_features = set(map(str, range(1, max(map(int, " ".join(df['Features']).split())) + 1)))
-
-# Add feature labels under each bar
+# Add feature labels under each bar (applies same rule for both methods)
 for i, (bar, feature_str) in enumerate(zip(bars, plot_df['Features'])):
-    features = set(feature_str.strip().split())
+    features = feature_str.strip().split()
 
-    if method_type == "backward":
-        removed = sorted(total_features - features, key=lambda x: int(x))
-        if len(removed) <= 8:
-            label = f"All but {' '.join(removed)}"
-        else:
-            label = f"{len(removed)} removed"
-    else:
-        # forward selection: show selected features directly
-        label = " ".join(sorted(features, key=lambda x: int(x)))
+    # Format feature label with 5 per row and enclosing braces
+    feature_lines = []
+    for j in range(0, len(features), 5):
+        line = " ".join(features[j:j+5])
+        if j == 0:
+            line = "{ " + line  # Open brace
+        if j + 5 >= len(features):
+            line += " }"       # Close brace at last line
+        feature_lines.append(line)
+    label = "\n".join(feature_lines)
 
     ax.text(bar.get_x() + bar.get_width() / 2,
-            -5,
+            -10,
             label,
             ha='center', va='top',
-            fontsize=8, rotation=15)
+            fontsize=8,
+            rotation=0)
+
 
 
 def format_features(features, row_len=5):
