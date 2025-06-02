@@ -19,6 +19,12 @@ python3 result_graph.py
 
 ## Input Summary
 * Enter test filename to input a dataset
+```bash
+// Here are some options to enter to test my code:
+CS205_small_Data__26.txt    // assigned small dataset
+CS205_large_Data__36.txt    // assigned large dataset
+cleaned_data.txt            // selected real-world dataset
+```
 * Enter choice 1 to select Forward Selection Function
 * Enter choice 2 to select Backward Elimination Function
 
